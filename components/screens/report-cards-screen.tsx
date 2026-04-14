@@ -3,9 +3,11 @@
 import { ArrowLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
+import { UserProfile } from "./sign-up-screen"
 
 interface ReportCardsScreenProps {
   onBack: () => void
+  userProfile?: UserProfile
 }
 
 type ReportView = "list" | "detail"
@@ -19,23 +21,10 @@ const reportCards = [
   { id: 6, title: "Class 2nd (2020-21)" },
 ]
 
-const studentProfile = {
-  name: "Mayank Mittal",
-  class: "Class 7th D",
-  avatar: "/images/avatar.jpg",
-  rollNumber: "035",
-  dateOfBirth: "10 Oct 1996",
-  bloodGroup: "B+",
-  emergencyContact: "+91 8290229190",
-  positionInClass: "7th",
-  fatherName: "Mr. Vansh",
-  motherName: "Mrs. Narang"
-}
-
 const schoolInfo = {
   name: "Sanskriti School",
   address: "Dr. S. Radhakrishnan Marg\nChanakyapuri, Agra\nUttar Pradesh - 110021",
-  logo: "/images/school-logo.jpg"
+  logo: "/images/Sanskriti School20161111.png"
 }
 
 const attendanceData = {
@@ -84,9 +73,51 @@ const teacherRemarks = {
   teacher: "Viraj Mehta"
 }
 
-export function ReportCardsScreen({ onBack }: ReportCardsScreenProps) {
+// Simple avatar SVG placeholder
+function AvatarPlaceholder({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="24" fill="#E0E0E0" />
+      <circle cx="24" cy="19" r="8" fill="#BDBDBD" />
+      <ellipse cx="24" cy="38" rx="13" ry="8" fill="#BDBDBD" />
+    </svg>
+  )
+}
+
+// Purple double-line divider
+function PurpleDivider() {
+  return (
+    <div className="w-full">
+      <div className="h-0.75 bg-[#473F97] w-full" />
+    </div>
+  )
+}
+
+export function ReportCardsScreen({ onBack, userProfile }: ReportCardsScreenProps) {
   const [view, setView] = useState<ReportView>("list")
   const [selectedCard, setSelectedCard] = useState<typeof reportCards[0] | null>(null)
+
+  const studentProfile = userProfile ? {
+    name: userProfile.name,
+    class: `Class ${userProfile.className}${userProfile.section ? userProfile.section : ""}`,
+    rollNumber: userProfile.rollNumber,
+    dateOfBirth: userProfile.dob,
+    bloodGroup: userProfile.bloodGroup,
+    emergencyContact: userProfile.emergencyContact,
+    positionInClass: "7th",
+    fatherName: userProfile.fatherName,
+    motherName: userProfile.motherName
+  } : {
+    name: "Mayank Mittal",
+    class: "Class 7th D",
+    rollNumber: "035",
+    dateOfBirth: "10 Oct 1996",
+    bloodGroup: "B+",
+    emergencyContact: "+91 8290229190",
+    positionInClass: "7th",
+    fatherName: "Mr. Vansh",
+    motherName: "Mrs. Narang"
+  }
 
   const viewReport = (card: typeof reportCards[0]) => {
     setSelectedCard(card)
@@ -108,40 +139,41 @@ export function ReportCardsScreen({ onBack }: ReportCardsScreenProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-auto">
-          {/* School Info */}
-          <div className="flex items-center gap-3 p-4 border-b border-gray-100">
-            <div className="w-14 h-14 rounded-full overflow-hidden">
+
+          {/* School Info — bigger logo + text */}
+          <div className="flex items-center gap-4 p-4">
+            <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
               <Image
                 src={schoolInfo.logo}
                 alt={schoolInfo.name}
-                width={56}
-                height={56}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <h2 className="text-[#00C853] font-semibold">{schoolInfo.name}</h2>
-              <p className="text-gray-500 text-xs whitespace-pre-line">{schoolInfo.address}</p>
+              <h2 className="text-[#473F97] font-bold text-lg leading-tight">{schoolInfo.name}</h2>
+              <p className="text-black text-sm whitespace-pre-line leading-snug mt-1">{schoolInfo.address}</p>
             </div>
           </div>
 
-          {/* Performance Profile Header */}
-          <div className="text-center py-3 border-b border-gray-100">
-            <span className="text-[#4A4A9E] font-semibold text-sm uppercase tracking-wide">
+          {/* Performance Profile — purple double lines top & bottom */}
+          <div className="px-4 pt-3">
+            <PurpleDivider />
+          </div>
+          <div className="text-center py-2">
+            <span className="text-[#473F97] font-semibold text-sm uppercase tracking-wide">
               Performance Profile
             </span>
           </div>
+          <div className="px-4 pb-3">
+            <PurpleDivider />
+          </div>
 
-          {/* Student Info */}
-          <div className="flex items-center gap-3 p-4 border-b border-gray-100">
-            <div className="w-12 h-12 rounded-full overflow-hidden">
-              <Image
-                src={studentProfile.avatar}
-                alt={studentProfile.name}
-                width={48}
-                height={48}
-                className="w-full h-full object-cover"
-              />
+          {/* Student Avatar + Name (no grey line under, general avatar) */}
+          <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+              <AvatarPlaceholder size={48} />
             </div>
             <div>
               <h3 className="font-semibold text-gray-800">{studentProfile.name}</h3>
@@ -149,139 +181,164 @@ export function ReportCardsScreen({ onBack }: ReportCardsScreenProps) {
             </div>
           </div>
 
-          {/* Student Details */}
-          <div className="px-4 py-2 border-b border-gray-100">
+          {/* Student Details — grey dividers between each row */}
+          <div className="px-4 py-1">
             {[
-              { label: "Roll Number", value: studentProfile.rollNumber, color: "text-[#4A4A9E]" },
-              { label: "Date of Birth", value: studentProfile.dateOfBirth, color: "text-gray-800" },
-              { label: "Blood Group", value: studentProfile.bloodGroup, color: "text-[#FD3667]" },
-              { label: "Emergency Contact", value: studentProfile.emergencyContact, color: "text-gray-800" },
-              { label: "Position in Class", value: studentProfile.positionInClass, color: "text-[#4A4A9E]" },
-              { label: "Father's Name", value: studentProfile.fatherName, color: "text-[#FD3667]" },
-              { label: "Mother's Name", value: studentProfile.motherName, color: "text-[#FD3667]" },
+              { label: "Roll Number", value: studentProfile.rollNumber, color: "text-[#473F97]" },
+              { label: "Date of Birth", value: studentProfile.dateOfBirth, color: "text-[#473F97]" },
+              { label: "Blood Group", value: studentProfile.bloodGroup, color: "text-[#473F97]" },
+              { label: "Emergency Contact", value: studentProfile.emergencyContact, color: "text-[#473F97]" },
+              { label: "Position in Class", value: studentProfile.positionInClass, color: "text-[#473F97]" },
+              { label: "Father's Name", value: studentProfile.fatherName, color: "text-[#473F97]" },
+              { label: "Mother's Name", value: studentProfile.motherName, color: "text-[#473F97]" },
             ].map((item, index) => (
-              <div key={index} className="flex justify-between py-2">
-                <span className="text-gray-500 text-sm">{item.label}</span>
-                <span className={`text-sm font-medium ${item.color}`}>{item.value}</span>
+              <div key={index}>
+                <div className="flex justify-between py-2">
+                  <span className="text-black text-sm">{item.label}</span>
+                  <span className={`text-sm font-medium ${item.color}`}>{item.value}</span>
+                </div>
+                {/* Grey divider under each row */}
+                <div className="h-[1px] bg-gray-200 w-full" />
               </div>
             ))}
           </div>
 
-          {/* Attendance */}
-          <div className="px-4 py-4 border-b border-gray-100">
-            <h3 className="text-center text-[#4A4A9E] font-semibold text-sm uppercase tracking-wide mb-4">
+          {/* Attendance — purple double lines top & bottom, centered text */}
+          <div className="px-4 pt-4">
+            <PurpleDivider />
+          </div>
+          <div className="text-center py-2">
+            <span className="text-[#473F97] font-semibold text-sm uppercase tracking-wide">
               Attendance
-            </h3>
-            
-            <div className="space-y-3">
-              <div>
-                <p className="text-gray-500 text-sm mb-1">Term I</p>
-                <div className="bg-[#E8F5E9] rounded-lg py-2 px-4">
-                  <span className="text-[#00C853] font-bold">
-                    {attendanceData.termI.present} / {attendanceData.termI.total} Days
-                  </span>
-                  <p className="text-[#00C853] text-xs">Total attendance of the student</p>
-                </div>
+            </span>
+          </div>
+          <div className="px-4">
+            <PurpleDivider />
+          </div>
+
+          <div className="px-4 py-4 space-y-3">
+            <div>
+              <p className="text-black text-sm mb-1 text-left font-medium">Term I</p>
+              <div className="bg-[#D4FFEA] rounded-lg py-3 px-4 text-center">
+                <span className="text-[#12B264] font-bold block">
+                  {attendanceData.termI.present} / {attendanceData.termI.total} Days
+                </span>
+                <p className="text-[#12B264] text-xs">Total attendance of the student</p>
               </div>
-              
-              <div>
-                <p className="text-gray-500 text-sm mb-1">Term II</p>
-                <div className="bg-[#FFF3E0] rounded-lg py-2 px-4">
-                  <span className="text-[#FFB74D] font-bold">
-                    {attendanceData.termII.present} / {attendanceData.termII.total} Days
-                  </span>
-                  <p className="text-[#FFB74D] text-xs">Total attendance of the student</p>
-                </div>
+            </div>
+            <div>
+              <p className="text-black text-sm mb-1 text-left font-medium">Term II</p>
+              <div className="bg-[#D4FFEA] rounded-lg py-3 px-4 text-center">
+                <span className="text-[#12B264] font-bold block">
+                  {attendanceData.termII.present} / {attendanceData.termII.total} Days
+                </span>
+                <p className="text-[#12B264] text-xs">Total attendance of the student</p>
               </div>
             </div>
           </div>
 
-          {/* Academic Performance */}
-          <div className="px-4 py-4 border-b border-gray-100">
-            <h3 className="text-center text-[#4A4A9E] font-semibold text-sm uppercase tracking-wide mb-4">
+          {/* Academic Performance — purple double lines top & bottom */}
+          <div className="px-4">
+            <PurpleDivider />
+          </div>
+          <div className="text-center py-2">
+            <span className="text-[#473F97] font-semibold text-sm uppercase tracking-wide">
               Academic Performance
-            </h3>
-            
+            </span>
+          </div>
+          <div className="px-4">
+            <PurpleDivider />
+          </div>
+
+          <div className="px-4 py-4">
+
             {/* Term I */}
             <div className="mb-6">
-              <p className="text-gray-500 text-sm mb-2">Term I</p>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-gray-500">
-                    <th className="text-left py-1">Subject</th>
-                    <th className="text-center py-1">Qtr 1</th>
-                    <th className="text-center py-1">Qtr 2</th>
-                    <th className="text-center py-1">Term I</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {academicData.termI.subjects.map((subject, index) => (
-                    <tr key={index}>
-                      <td className="py-1 text-[#FD3667]">{subject.name}</td>
-                      <td className="py-1 text-center text-gray-600">{subject.qtr1}</td>
-                      <td className="py-1 text-center text-gray-600">{subject.qtr2}</td>
-                      <td className="py-1 text-center font-semibold text-gray-800">{subject.term}</td>
+              <p className="text-balck font-light mb-2">Term I</p>
+              {/* Grey background table */}
+              <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-black ">
+                      <th className="text-left py-2 px-3">Subject</th>
+                      <th className="text-center py-2 px-2">Qtr 1</th>
+                      <th className="text-center py-2 px-2">Qtr 2</th>
+                      <th className="text-center py-2 px-2">Term I</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {academicData.termI.subjects.map((subject, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "bg-[#FFFFFF]/50" : "bg-[#E8EAEC]"}>
+                        <td className="py-2 px-3 text-[#473F97] font-bold">{subject.name}</td>
+                        <td className="py-2 px-2 text-center text-gray-600">{subject.qtr1}</td>
+                        <td className="py-2 px-2 text-center text-gray-600">{subject.qtr2}</td>
+                        <td className="py-2 px-2 text-center font-semibold text-gray-800">{subject.term}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="flex justify-end mt-2">
-                <span className="text-[#FD3667] mr-2">GPA</span>
-                <span className="text-[#4A4A9E] font-bold">{academicData.termI.gpa}</span>
+                <span className="text-[#FD3667] font-bold mr-9">GPA</span>
+                <span className="text-[#FD3667] font-bold mr-5">{academicData.termI.gpa}</span>
               </div>
             </div>
 
             {/* Term II */}
             <div className="mb-6">
-              <p className="text-gray-500 text-sm mb-2">Term II</p>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-gray-500">
-                    <th className="text-left py-1">Subject</th>
-                    <th className="text-center py-1">Qtr 1</th>
-                    <th className="text-center py-1">Qtr 2</th>
-                    <th className="text-center py-1">Term II</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {academicData.termII.subjects.map((subject, index) => (
-                    <tr key={index}>
-                      <td className="py-1 text-[#FD3667]">{subject.name}</td>
-                      <td className="py-1 text-center text-gray-600">{subject.qtr1}</td>
-                      <td className="py-1 text-center text-gray-600">{subject.qtr2}</td>
-                      <td className="py-1 text-center font-semibold text-gray-800">{subject.term}</td>
+              <p className="text-black text-sm mb-2">Term II</p>
+              <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-black">
+                      <th className="text-left py-2 px-3">Subject</th>
+                      <th className="text-center py-2 px-2">Qtr 1</th>
+                      <th className="text-center py-2 px-2">Qtr 2</th>
+                      <th className="text-center py-2 px-2">Term II</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {academicData.termII.subjects.map((subject, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "bg-[#FFFFFF]/50" : "bg-[#E8EAEC]"}>
+                        <td className="py-2 px-3 text-[#473F97] font-bold">{subject.name}</td>
+                        <td className="py-2 px-2 text-center text-black">{subject.qtr1}</td>
+                        <td className="py-2 px-2 text-center text-black">{subject.qtr2}</td>
+                        <td className="py-2 px-2 text-center font-semibold text-gray-800">{subject.term}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="flex justify-end mt-2">
-                <span className="text-[#FD3667] mr-2">GPA</span>
-                <span className="text-[#4A4A9E] font-bold">{academicData.termII.gpa}</span>
+                <span className="text-[#FD3667] font-bold mr-9">GPA</span>
+                <span className="text-[#FD3667] font-bold mr-5">{academicData.termII.gpa}</span>
               </div>
             </div>
 
             {/* Final */}
             <div>
-              <p className="text-gray-500 text-sm mb-2">Final</p>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-gray-500">
-                    <th className="text-left py-1">Subject</th>
-                    <th className="text-right py-1">Final</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {academicData.final.subjects.map((subject, index) => (
-                    <tr key={index}>
-                      <td className="py-1 text-[#FD3667]">{subject.name}</td>
-                      <td className="py-1 text-right font-semibold text-gray-800">{subject.grade}</td>
+              <p className="text-balck text-sm mb-2">Final</p>
+              <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-black">
+                      <th className="text-left py-2 px-3">Subject</th>
+                      <th className="text-right py-2 px-3">Final</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {academicData.final.subjects.map((subject, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "bg-[#FFFFFF]/50" : "bg-[#E8EAEC]"}>
+                        <td className="py-2 px-3 text-[#473F97] font-bold">{subject.name}</td>
+                        <td className="py-2 px-3 text-right font-semibold text-gray-800">{subject.grade}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="flex justify-end mt-2">
-                <span className="text-[#FD3667] mr-2">GPA</span>
-                <span className="text-[#4A4A9E] font-bold">{academicData.final.gpa}</span>
+                <span className="text-[#FD3667] font-bold mr-9">GPA</span>
+                <span className="text-[#FD3667] font-bold mr-5">{academicData.final.gpa}</span>
               </div>
             </div>
           </div>
@@ -289,11 +346,12 @@ export function ReportCardsScreen({ onBack }: ReportCardsScreenProps) {
           {/* Teacher Remarks */}
           <div className="px-4 py-4">
             <h3 className="text-gray-800 font-semibold text-sm mb-2">Remarks by Teacher</h3>
-            <div className="bg-[#FFF8E1] rounded-lg p-4">
-              <p className="text-gray-600 text-sm leading-relaxed">{teacherRemarks.text}</p>
+            <div className="bg-[#FFE9D4] rounded-lg p-4">
+              <p className="text-[#B98757] text-sm leading-relaxed">{teacherRemarks.text}</p>
             </div>
-            <p className="text-[#FD3667] text-sm mt-2">- {teacherRemarks.teacher}</p>
+            <p className="text-[#FD3667] text-bold mt-2">- {teacherRemarks.teacher}</p>
           </div>
+
         </div>
       </div>
     )
